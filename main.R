@@ -1,46 +1,48 @@
+source("./steps/data_loader.R")
+source("./steps/data_split.R")
 source("./steps/data_analyzer.R")
+source("./steps/svm_train.R")
+source("./steps/svm_test.R")
 
-x <- read.csv("./dataset/raw/X.txt", header = F, sep=" ")
-c <- read.csv("./dataset/raw/C.txt", header = F, sep=" ")
-y <- read.csv("./dataset/raw/Y.txt", header = F, sep=" ")
-
-names(x) <- lapply(names(x), function(x) { gsub("V", "X", x) })
-names(c) <- lapply(names(c), function(x) { gsub("V", "C", x) })
-names(y) <- lapply(names(y), function(x) { gsub("V", "Y", x) })
-x <- cbind(x,c)
+data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
+x = data$x
+c = data$c
+y = data$y
 
 # Split dataset
-dataset <- data_split(x, y, percentace = 0.8, balanced = T)
-train_dataset = list(x=dataset["x_train"], y=dataset["y_train"])
-test_dataset = list(x=dataset["x_test"], y=dataset["y_test"])
+dataset <- data_split(x, y, percentage = 0.8)
+train_set <- list(x=dataset$x_train, y=dataset$y_train)
+test_set <- list(x=dataset$x_test, y=dataset$y_test)
 
 # Analyze train dataset
-data_analyzer(train_dataset["x"], train_dataset["y"])
+#data_analyze(train_set["x"], train_set["y"])
 
 # Clean train dataset
-train_dataset <- data_cleaner(train_dataset["x"], train_dataset["y"])
+#train_set <- data_cleaner(train_set["x"], train_set["y"])
 
 # Augment train dataset
-#train_dataset <- data_augmentation(train_dataset["x"], train_dataset["y"])
+#train_set <- data_augmentation(train_set["x"], train_set["y"])
 
 ##### Now the train phase #####
 
 # Feature select train dataset
-train_dataset <- data_fselection(train_dataset["x"], train_dataset["y"])
+#train_set <- data_fselection(train_set["x"], train_set["y"])
 
 # Normalize train dataset
-train_dataset, normalizer <- data_normalization(train_dataset["x"], train_dataset["y"])
+#train_set, normalizer <- data_normalization(train_set["x"], train_set["y"])
 
 # Train model
-train_metrics, model <- svm_train(train_dataset["x"], train_dataset["y"])
+train_result <- svm_train(train_set$x, train_set$y)
+model <- train_result$model
+train_metrics <- train_result$metrics
 
 ##### Now the test phase #####
 
 # Feature select test dataset
-test_dataset <- data_fselection(test_dataset["x"], test_dataset["y"])
+#test_set <- data_fselection(test_set["x"], test_set["y"])
 
 # Normalize test dataset
-test_dataset <- data_normalization(test_dataset["x"], test_dataset["y"], normalizer=normalizer)
+#test_set <- data_normalization(test_set["x"], test_set["y"], normalizer=normalizer)
 
 # Test model
-test_metrics <- svm_test(model, test_dataset["x"], test_dataset["y"])
+test_metrics <- svm_test(model, test_set$x, test_set$y)

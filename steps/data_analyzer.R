@@ -2,7 +2,7 @@ library("ggplot2")
 library("dplyr")
 source('./utils/outliers_detection.R')
 
-data_analyzer <- function(my_data){
+data_analyze <- function(my_data){
   
   plot_folder <- paste(getwd(), "plot/", sep="/" )
   if (!dir.exists(plot_folder)) {
