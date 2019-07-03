@@ -3,6 +3,7 @@ source("./steps/data_split.R")
 source("./steps/data_analyzer.R")
 source("./steps/svm_train.R")
 source("./steps/svm_test.R")
+source("./utils/bci_matrix_utils.R")
 
 data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
 x = data$x
@@ -45,4 +46,5 @@ train_metrics <- train_result$metrics
 #test_set <- data_normalization(test_set["x"], test_set["y"], normalizer=normalizer)
 
 # Test model
-test_metrics <- svm_test(model, test_set$x, test_set$y)
+test_result <- svm_test(model, test_set$x, test_set$y)
+translate_to_word(test_set$x[,ncol(test_set$x)], sapply(test_result$output, levels))

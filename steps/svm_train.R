@@ -11,5 +11,5 @@ svm_train <- function(x, y) {
   
   accuracy <- round((confusion_matrix["1","1"] + confusion_matrix["-1","-1"]) / nrow(x), 4)
   
-  return(list(model = model, metrics=list(cm=confusion_matrix, accuracy = accuracy)))
+  return(list(model = model, metrics=list(cm=confusion_matrix, accuracy = accuracy), output=predictions))
 }
