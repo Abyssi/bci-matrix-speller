@@ -2,7 +2,13 @@ library("ggplot2")
 library("dplyr")
 source('./utils/outliers_detection.R')
 
-data_analyzer <- function(my_data, plot_folder){
+data_analyzer <- function(my_data){
+  
+  plot_folder <- paste(getwd(), "plot/", sep="/" )
+  if (!dir.exists(plot_folder)) {
+    dir.create(plot_folder)
+  }
+  
   set.seed(123)
   
   data_rows <- nrow(my_data)
@@ -13,7 +19,7 @@ data_analyzer <- function(my_data, plot_folder){
   numeric_attribute <- names(Filter(is.numeric,my_data))
   
   my_plot <- function(varName) {
-    ggplot(my_data, aes_string("risultato",varName)) +
+    ggplot(my_data, aes_string("V1",varName)) +
       geom_boxplot() +
       ggtitle(paste("Distribuzione statistica dell'attributo:",varName,sep=" "))
     theme_bw()
