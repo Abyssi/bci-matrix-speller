@@ -32,6 +32,22 @@ translate_to_word <- function(c, y) {
   return(paste(result, collapse=''))
 }
 
+find_best_pair <- function(y) {
+  result <- rep(c(-1), times = 12)
+  sorted <- order(y)
+  result[sorted[1]] <- 1
+  result[sorted[2]] <- 1
+  return(result)
+}
+
+find_best_pairs <- function(y) {
+  result <- c()
+  for (i in 0:floor(length(test_result$output)/12)) {
+    result <- append(result, find_best_pair(y[i*12+1:12]))
+  }
+  return(result)
+}
+
 
 #c_test <- rep(c(1, 2, 6, 4, 3, 5, 7, 8, 12, 10, 9, 11), times = 10*5)
 #y_test <- rep(c(-1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1), times = 10*5)
