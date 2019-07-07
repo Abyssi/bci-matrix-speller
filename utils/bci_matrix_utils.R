@@ -1,13 +1,16 @@
 alphabet <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_")
 
 find_char <- function(row, column) {
+  #cat("row ", row, "column ", column, "\n")
   m = matrix(alphabet, nrow=6, ncol=6, byrow = TRUE)
+  #print(m[row, column-6])
   return(m[row, column-6])
 }
 
 translate_to_char <- function(c, y) { 
   indices <- c[which(y %in% 1)]
-  return(find_char(min(indices), max(indices)))
+  #print(indices)
+  return(find_char(if(!is.null(indices) & length(indices) > 0) if (indices[1] < 7) indices[1] else 1 else 1, if(!is.null(indices) & length(indices) > 0) if (indices[length(indices)] > 6) indices[length(indices)] else 7 else 7))
 }
 
 best_char <- function(c, y) { 

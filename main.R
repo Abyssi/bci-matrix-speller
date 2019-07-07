@@ -33,6 +33,7 @@ test_set <- list(x=dataset$x_test, y=dataset$y_test)
 #train_set, normalizer <- data_normalization(train_set["x"], train_set["y"])
 
 # Train model
+source("./steps/svm_train.R")
 train_result <- svm_train(train_set$x, train_set$y)
 model <- train_result$model
 train_metrics <- train_result$metrics
@@ -46,5 +47,10 @@ train_metrics <- train_result$metrics
 #test_set <- data_normalization(test_set["x"], test_set["y"], normalizer=normalizer)
 
 # Test model
+source("./steps/svm_test.R")
 test_result <- svm_test(model, test_set$x, test_set$y)
-translate_to_word(test_set$x[,ncol(test_set$x)], sapply(test_result$output, levels))
+translate_to_word(test_set$x[,ncol(test_set$x)], test_set$y)
+source("./utils/bci_matrix_utils.R")
+print(test_result$output)
+print(as.integer(t(as.data.frame(test_result$output))))
+translate_to_word(test_set$x[,ncol(test_set$x)], as.integer(t(as.data.frame(test_result$output))))

@@ -3,9 +3,9 @@ library("e1071")
 svm_train <- function(x, y) {
   set.seed(123)
   
-  model <- svm(x=x, y=y, scale=F, type="C-classification", kernel="radial")
+  model <- svm(x=x, y=y, scale=F, type="C-classification", kernel="radial")#, probability = TRUE)
   
-  predictions <- predict(model, x)
+  predictions <- predict(model, x)#, probability = TRUE)
   
   confusion_matrix <- table(predicted = predictions, observation = y)
   
