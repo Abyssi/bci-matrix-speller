@@ -30,7 +30,8 @@ train_set$x <- data_cleaner(train_set$x)
 ##### Now the train phase #####
 
 # Feature select train dataset
-#train_set <- data_fselection(train_set["x"], train_set["y"])
+source("./steps/data_fselection.R")
+train_set$x <- data_fselection(train_set$x)
 
 # Normalize train dataset
 source("./steps/data_normalization.R")
