@@ -34,9 +34,8 @@ translate_to_word <- function(c, y) {
 
 find_best_pair <- function(y) {
   result <- rep(c(-1), times = 12)
-  sorted <- order(y)
-  result[sorted[1]] <- 1
-  result[sorted[2]] <- 1
+  result[order(y[1:6])[1]] <- 1
+  result[6+order(y[7:12])[1]] <- 1
   return(result)
 }
 
