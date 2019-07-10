@@ -41,12 +41,28 @@ find_best_pair <- function(y) {
 
 find_best_pairs <- function(y) {
   result <- c()
-  for (i in 0:floor(length(test_result$output)/12)) {
+  for (i in 0:(floor(length(test_result$output)/12)-1)) {
     result <- append(result, find_best_pair(y[i*12+1:12]))
   }
   return(result)
 }
 
+accuracy_by_char <- function(y, y_pred) {
+  y <- strsplit(y, "")[[1]]
+  y_pred <- strsplit(y_pred, "")[[1]]
+  counter <- 0
+  for (i in 1:length(y)) {
+    if (!identical(y[i], y_pred[i])) {
+      counter <- counter+1
+    }
+  }
+  return(counter/length(y))
+}
+
+accuracy_by_row_column <- function(y, y_pred) {
+  res <<- y - y_pred
+  return(length(res[res>0])/(length(y)/6))
+}
 
 #c_test <- rep(c(1, 2, 6, 4, 3, 5, 7, 8, 12, 10, 9, 11), times = 10*5)
 #y_test <- rep(c(-1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1), times = 10*5)

@@ -49,10 +49,14 @@ train_metrics <- train_result$metrics
 # Test model
 source("./steps/svm_test.R")
 test_result <- svm_test(model, test_set$x, test_set$y)
-translate_to_word(test_set$x[,ncol(test_set$x)], test_set$y)
+word_a <- translate_to_word(test_set$x[,ncol(test_set$x)], test_set$y)
 source("./utils/bci_matrix_utils.R")
 result <- find_best_pairs(attr(test_result$output, "probabilities")[,1])
-translate_to_word(test_set$x[,ncol(test_set$x)], result)
+word_b <- translate_to_word(test_set$x[,ncol(test_set$x)], result)
+
+source("./utils/bci_matrix_utils.R")
+accuracy_by_char(word_a, word_b)
+accuracy_by_row_column(test_set$y, result)
 
 #print(test_result$output)
 #print(as.integer(t(as.data.frame(test_result$output))))

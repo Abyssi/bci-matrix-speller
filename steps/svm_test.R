@@ -5,7 +5,7 @@ svm_test <- function(model, x, y) {
   
   predictions <- predict(model, x, decision.values = TRUE, probability = TRUE)
   #predictions <- predict(model, x)
-  print(predictions)
+  #print(predictions)
 
   confusion_matrix <- table(predicted = predictions, observation = y)
   
