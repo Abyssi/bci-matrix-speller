@@ -9,13 +9,7 @@ data_load <- function(x_path, c_path, y_path) {
   names(c) <- lapply(names(c), function(x) { gsub("V", "C_", x) })
   names(y) <- lapply(names(y), function(x) { gsub("V", "Y_", x) })
   
-  x_split <- lapply(sensors, function (value) {
-    columns <- lapply(as.list(1:floor(length(x)/length(sensors))), function(x) {paste(value, x, sep="_")})
-    return(x[, unlist(columns)])
-  })
-  
-  names(x_split) <- sensors
-
   x <- cbind(x,c)
-  return(list(x=x, c=c, y=y, x_split=x_split))
+  
+  return(list(x=x, c=c, y=y))
 }
