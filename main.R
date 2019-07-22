@@ -52,7 +52,7 @@ word_train
 ##### Now the test phase #####
 
 # Feature select test dataset
-#test_set <- data_fselection(test_set["x"], test_set["y"])
+test_set$x <- data_fselection(test_set$x)
 
 # Normalize test dataset
 source("./steps/data_normalization.R")

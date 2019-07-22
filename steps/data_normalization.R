@@ -1,4 +1,4 @@
-data_normalization <- function(x, normalizer=NULL) {as.matr
+data_normalization <- function(x, normalizer=NULL) {
   if (is.null(normalizer)) {
     scaled <- scale(x, center = T, scale = T)
   }
