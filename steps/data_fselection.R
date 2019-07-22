@@ -1,10 +1,10 @@
-derivative <- function (x) {
-  return(diff(as.matrix(x), lag=1))
-}
-
-data_fselection <- function(data) {
-  der <<- as.data.frame(derivative(data))
-  names(der) <- lapply(names(der), function(x) { gsub("X", "D", x) })
-  result <- cbind(data, der)
+data_fselection <- function(data, data_split) {
+  result <- lapply(data_split, function (value) {
+    der <- as.data.frame(t(diff(t(as.matrix(value)), lag=1)))
+    names(der) <- lapply(names(der), function(x) { return(paste("D", x, sep="_")) })
+    return(der)
+  })
+  result <- Reduce(function(...) cbind(...), train_set$aaa)
+  #result <- cbind(data, result)
   return(result)
 }

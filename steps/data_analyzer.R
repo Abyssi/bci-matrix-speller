@@ -1,15 +1,17 @@
 library("ggplot2")
 library("dplyr")
-source('./utils/outliers_detection.R')
+library("car")
 
-data_analyze <- function(my_data){
+data_analyze <- function(my_data) {
+  set.seed(123)
   
   plot_folder <- paste(getwd(), "plot/", sep="/" )
   if (!dir.exists(plot_folder)) {
     dir.create(plot_folder)
   }
   
-  set.seed(123)
+  plot(unlist(x_split$Fz[1,]), type="l", col="green")
+  densityPlot(unlist(x[1]))
   
   data_rows <- nrow(my_data)
   

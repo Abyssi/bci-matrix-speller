@@ -5,10 +5,12 @@ source("./steps/svm_train.R")
 source("./steps/svm_test.R")
 source("./utils/bci_matrix_utils.R")
 
+source("./steps/data_loader.R")
 data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
-x = data$x
-c = data$c
-y = data$y
+x <- data$x
+c <- data$c
+y <- data$y
+x_split <- data$x_split
 
 # Split dataset
 dataset <- data_split(x, y, percentage = 0.8)
@@ -17,12 +19,17 @@ test_set <- list(x=dataset$x_test, y=dataset$y_test)
 raw_train_set <- train_set
 raw_test_set <- test_set
 
+# Reformat dataset
+source("./steps/data_reformat.R")
+train_set <- data_reformat(train_set)
+
 # Analyze train dataset
-#data_analyze(train_set["x"], train_set["y"])
+#source("./steps/data_analyzer.R")
+#data_analyze(train_set$x, train_set$y)
 
 # Clean train dataset
 source("./steps/data_cleaner.R")
-train_set$x <- data_cleaner(train_set$x)
+#train_set$x <- data_cleaner(train_set$x)
 
 # Augment train dataset
 #train_set <- data_augmentation(train_set["x"], train_set["y"])
@@ -31,12 +38,12 @@ train_set$x <- data_cleaner(train_set$x)
 
 # Feature select train dataset
 source("./steps/data_fselection.R")
-train_set$x <- data_fselection(train_set$x)
+train_set$aaa <- data_fselection(train_set$x, data$x_split)
 
 # Normalize train dataset
 source("./steps/data_normalization.R")
 normalized <- data_normalization(train_set$x)
-#train_set$x <- normalized$output
+train_set$x <- normalized$output
 normalizer <- normalized$normalizer
 
 # Train model
@@ -54,7 +61,7 @@ word_train
 
 # Normalize test dataset
 source("./steps/data_normalization.R")
-#test_set$x <- data_normalization(test_set$x, normalizer)$output
+test_set$x <- data_normalization(test_set$x, normalizer)$output
 
 # Test model
 source("./steps/svm_test.R")
