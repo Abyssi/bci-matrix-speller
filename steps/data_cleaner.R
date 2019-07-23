@@ -4,7 +4,7 @@ data_cleaner <- function(x){
 
 replace_outliers <- function(x){
   set.seed(123)
-  qnt <- quantile(x, c(0.25, 0.75), na.rm = TRUE)
+  qnt <- quantile(x, c(0.1, 0.9), na.rm = TRUE)
   benchmark1 <- (qnt[1]-(qnt[2]-qnt[1])*1.5)
   benchmark2 <- (qnt[2]+(qnt[2]-qnt[1])*1.5)
   output <- sapply(x,function(y){

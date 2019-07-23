@@ -56,7 +56,7 @@ accuracy_by_char <- function(y, y_pred) {
       counter <- counter+1
     }
   }
-  return(counter/length(y))
+  return(1 - (counter/length(y)))
 }
 
 accuracy_by_row_column <- function(y, y_pred) {

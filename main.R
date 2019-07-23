@@ -46,8 +46,13 @@ source("./steps/svm_train.R")
 train_result <- svm_train(train_set$x, train_set$y)
 model <- train_result$model
 train_metrics <- train_result$metrics
-word_train <- translate_to_word(train_set$x[,ncol(train_set$x)], train_set$y)
+train_metrics
+word_train <- translate_to_word(raw_train_set$x[,ncol(raw_train_set$x)], train_set$y)
 word_train
+
+source("./utils/bci_matrix_utils.R")
+accuracy_by_char(word_a, word_b)
+accuracy_by_row_column(test_set$y, result)
 
 ##### Now the test phase #####
 
@@ -61,11 +66,14 @@ test_set$x <- data_normalization(test_set$x, normalizer)$output
 # Test model
 source("./steps/svm_test.R")
 test_result <- svm_test(model, test_set$x, test_set$y)
-word_a <- translate_to_word(test_set$x[,ncol(test_set$x)], test_set$y)
+test_metrics <- test_result$metrics
+test_metrics
+
+word_a <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], test_set$y)
 word_a
 source("./utils/bci_matrix_utils.R")
 result <- find_best_pairs(attr(test_result$output, "probabilities")[,1])
-word_b <- translate_to_word(test_set$x[,ncol(test_set$x)], result)
+word_b <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], result)
 word_b
 
 source("./utils/bci_matrix_utils.R")
