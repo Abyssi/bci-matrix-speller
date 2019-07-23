@@ -3,9 +3,7 @@ library("e1071")
 svm_test <- function(model, x, y) {
   set.seed(123)
   
-  predictions <- predict(model, x, decision.values = TRUE, probability = TRUE)
-  #predictions <- predict(model, x)
-  #print(predictions)
+  predictions <- predict(model, x, probability = TRUE)
 
   confusion_matrix <- table(predicted = predictions, observation = y)
   

@@ -1,5 +1,5 @@
-data_cleaner <- function(x){
-  return(sapply(train_set$x, function(x) data_cleaner(x) ))
+data_cleaner <- function(data){
+  return(sapply(data, function(x) replace_outliers(x) ))
 }
 
 replace_outliers <- function(x){

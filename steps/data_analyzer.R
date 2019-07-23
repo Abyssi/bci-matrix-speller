@@ -1,8 +1,7 @@
-library("ggplot2")
 library("dplyr")
 library("car")
 
-data_analyze <- function(my_data) {
+data_analyze <- function(x, y) {
   set.seed(123)
   
   plot_folder <- paste(getwd(), "plot/", sep="/" )
@@ -10,41 +9,14 @@ data_analyze <- function(my_data) {
     dir.create(plot_folder)
   }
   
+  sensors <- c("Fz", "Cz", "Pz", "Oz", "P3", "P4", "PO7", "PO8")
+  
+  x_split <- lapply(sensors, function (value) {
+    columns <- lapply(as.list(1:floor(length(x)/length(sensors))), function(x) {paste(value, x, sep="_")})
+    return(x[unlist(columns)])
+  })
+  names(x_split) <- sensors
+  
   plot(unlist(x_split$Fz[1,]), type="l", col="green")
   densityPlot(unlist(x[1]))
-  
-  data_rows <- nrow(my_data)
-  
-  type_attribute <- lapply(my_data, class)
-  summary_attribute <- lapply(my_data, summary)
-  
-  numeric_attribute <- names(Filter(is.numeric,my_data))
-  
-  my_plot <- function(varName) {
-    ggplot(my_data, aes_string("V1",varName)) +
-      geom_boxplot() +
-      ggtitle(paste("Distribuzione statistica dell'attributo:",varName,sep=" "))
-    theme_bw()
-    ggsave(paste(plot_folder, paste(varName,"png", sep="."),sep=""))
-  }
-  
-  lapply(numeric_attribute,my_plot)
-  
-  numeric_attribute <- names(Filter(is.numeric,my_data))
-  outlier_list <- lapply(numeric_attribute,outliers_detection,dataset=my_data)
-  names(outlier_list) <- numeric_attribute 
-  
-  n_duplicate <- sum(duplicated(my_data))
-  perc_duplicate <- round(n_duplicate/data_rows,4)
-  
-  n_complete <- sum(complete.cases(my_data))
-  n_incomplete <- nrow(my_data)-n_complete
-  perc_incomplete <- 1-(round((n_complete/data_rows),4))
-  
-  aggregate_information <- rbind(n_duplicate,perc_duplicate,n_incomplete,perc_incomplete)
-  rownames(aggregate_information) <- c("Numero di duplicati","percentuale di duplicati","Numero istanze incomplete","Percentuale istanze incomplete")
-
-  output <- list(aggregate_information,type_attribute,summary_attribute,outlier_list)
-  names(output) <- c("Analisi istanze","Attribute class","Attribute Summary","Lista degli outliers")
-  return(output)
 }

@@ -1,10 +1,4 @@
-source("./steps/data_loader.R")
-source("./steps/data_split.R")
-source("./steps/data_analyzer.R")
-source("./steps/svm_train.R")
-source("./steps/svm_test.R")
-source("./utils/bci_matrix_utils.R")
-
+# Load dataset
 source("./steps/data_loader.R")
 data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
 x <- data$x
@@ -12,74 +6,106 @@ c <- data$c
 y <- data$y
 
 # Split dataset
+source("./steps/data_split.R")
 dataset <- data_split(x, y, percentage = 0.8)
 train_set <- list(x=dataset$x_train, y=dataset$y_train)
 test_set <- list(x=dataset$x_test, y=dataset$y_test)
 raw_train_set <- train_set
 raw_test_set <- test_set
 
-# Analyze train dataset
-#source("./steps/data_analyzer.R")
-#data_analyze(train_set$x, train_set$y)
+pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, weight_yes=1) {
+  print("Starting")
+  ##### Now the train set pipeline #####
+  
+  # Analyze train set
+  print("Analyze train set")
+  source("./steps/data_analyzer.R")
+  data_analyze(train_set$x, train_set$y)
+  
+  # Clean train set
+  print("Clean train set")
+  source("./steps/data_cleaner.R")
+  train_set$x <- data_cleaner(train_set$x)
+  
+  # Feature select train set
+  print("Feature select train set")
+  source("./steps/data_fselection.R")
+  selected <- data_fselection(train_set$x, train_set$y)
+  train_set$x <- selected$output
+  selector <- selected$selector
 
-# Clean train dataset
-source("./steps/data_cleaner.R")
-train_set$x <- data_cleaner(train_set$x)
+  # Normalize train set
+  print("Normalize train set")
+  source("./steps/data_normalization.R")
+  normalized <- data_normalization(train_set$x)
+  train_set$x <- normalized$output
+  normalizer <- normalized$normalizer
 
-# Augment train dataset
-#train_set <- data_augmentation(train_set["x"], train_set["y"])
+  ##### Now the test set pipeline #####
+  
+  # Feature select test set
+  print("Feature select test set")
+  source("./steps/data_fselection.R")
+  test_set$x <- data_fselection(test_set$x, test_set$y, selector)$output
 
-##### Now the train phase #####
+  # Normalize test set
+  print("Normalize test set")
+  source("./steps/data_normalization.R")
+  test_set$x <- data_normalization(test_set$x, normalizer)$output
 
-# Feature select train dataset
-source("./steps/data_fselection.R")
-train_set$x <- data_fselection(train_set$x)
+  ##### Now the model definition #####
+  
+  # Define the model
+  print("Define the model")
+  source("./utils/class_svm.R")
+  model <- class_svm(kernel=kernel, cost=cost, weights=c("-1"=weight_no, "1"=weight_yes))
 
-# Normalize train dataset
-source("./steps/data_normalization.R")
-normalized <- data_normalization(train_set$x)
-train_set$x <- normalized$output
-normalizer <- normalized$normalizer
+  ##### Now the train phase #####
+  
+  # Train model
+  print("Train model")
+  source("./steps/svm_train.R")
+  train_result <- svm_train(train_set$x, train_set$y)
+  model <- train_result$model
+  
+  # Evalutate model on train set
+  print("Evalutate model on train set")
+  source("./utils/bci_matrix_utils.R")
+  train_p <- find_best_pairs(attr(train_result$output, "probabilities")[,1])
+  train_word <- translate_to_word(raw_train_set$x[,ncol(raw_train_set$x)], train_set$y)
+  train_word_p <- translate_to_word(raw_train_set$x[,ncol(raw_train_set$x)], train_p)
+  
+  train_metrics <- list(metrics=train_result$metrics, 
+                        accuracy_by_row_column=accuracy_by_row_column(train_set$y, train_p),
+                        accuracy_by_char=accuracy_by_char(train_word, train_word_p),
+                        train_word=train_word,
+                        train_word_p=train_word_p)
 
-# Train model
-source("./steps/svm_train.R")
-train_result <- svm_train(train_set$x, train_set$y)
-model <- train_result$model
-train_metrics <- train_result$metrics
-train_metrics
-word_train <- translate_to_word(raw_train_set$x[,ncol(raw_train_set$x)], train_set$y)
-word_train
+  ##### Now the test phase #####
+  
+  # Test model
+  print("Test model")
+  source("./steps/svm_test.R")
+  test_result <- svm_test(model, test_set$x, test_set$y)
+  
+  # Evalutate model on test set
+  print("Evalutate model on test set")
+  source("./utils/bci_matrix_utils.R")
+  test_p <- find_best_pairs(attr(test_result$output, "probabilities")[,1])
+  test_word <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], test_set$y)
+  test_word_p <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], test_p)
+  
+  test_metrics <- list(metrics=test_result$metrics, 
+                       accuracy_by_row_column=accuracy_by_row_column(test_set$y, test_p),
+                       accuracy_by_char=accuracy_by_char(test_word, test_word_p),
+                       test_word=test_word,
+                       test_word_p=test_word_p)
 
-source("./utils/bci_matrix_utils.R")
-accuracy_by_char(word_a, word_b)
-accuracy_by_row_column(test_set$y, result)
+  #Return metrics
+  return(list(train_metrics=train_metrics, test_metrics=test_metrics))
+}
 
-##### Now the test phase #####
-
-# Feature select test dataset
-test_set$x <- data_fselection(test_set$x)
-
-# Normalize test dataset
-source("./steps/data_normalization.R")
-test_set$x <- data_normalization(test_set$x, normalizer)$output
-
-# Test model
-source("./steps/svm_test.R")
-test_result <- svm_test(model, test_set$x, test_set$y)
-test_metrics <- test_result$metrics
-test_metrics
-
-word_a <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], test_set$y)
-word_a
-source("./utils/bci_matrix_utils.R")
-result <- find_best_pairs(attr(test_result$output, "probabilities")[,1])
-word_b <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], result)
-word_b
-
-source("./utils/bci_matrix_utils.R")
-accuracy_by_char(word_a, word_b)
-accuracy_by_row_column(test_set$y, result)
-
-#print(test_result$output)
-#print(as.integer(t(as.data.frame(test_result$output))))
-#translate_to_word(test_set$x[,ncol(test_set$x)], as.integer(t(as.data.frame(test_result$output))))
+#source("./utils/grid_search.R")
+#grid_search(pipeline, list(train_set=c(train_set), test_set=c(test_set), kernel=c("linear", "radial", "polynomial", "sigmoid", "custom"), cost=c(1:10), weight_no=c(0.5), weight_yes=c(1)))
+metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1)
+print(metrics)

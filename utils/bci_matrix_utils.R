@@ -38,7 +38,7 @@ find_best_pair <- function(y) {
 
 find_best_pairs <- function(y) {
   result <- c()
-  for (i in 0:(floor(length(test_result$output)/12)-1)) {
+  for (i in 0:(floor(length(y)/12)-1)) {
     result <- append(result, find_best_pair(y[i*12+1:12]))
   }
   return(result)
@@ -57,7 +57,7 @@ accuracy_by_char <- function(y, y_pred) {
 }
 
 accuracy_by_row_column <- function(y, y_pred) {
-  res <<- y - y_pred
+  res <- y - y_pred
   return(length(res[res>0])/(length(y)/6))
 }
 
