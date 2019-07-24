@@ -18,7 +18,8 @@ data_fselection <- function(input, labels, selector=NULL) {
   result <- cbind(input, result)
   
   if (is.null(selector)) {
-    features <- attrEval(label ~ ., cbind(result, label=as.factor(labels)), estimator="ReliefFexpRank", kNearestExpRank=70, ReliefIterations=5)
+    features <- attrEval(label ~ ., cbind(result, label=as.factor(labels)), estimator="ReliefFexpRank", kNearestExpRank=10, ReliefIterations=5)
+    #features <- attrEval(label ~ ., cbind(result, label=as.factor(labels)), estimator="ReliefFequalK", kNearestExpRank=10, ReliefIterations=5)
     features <- sort(features, decreasing = T)
     features_subset <- names(features)[which(features >= 0)]
   }

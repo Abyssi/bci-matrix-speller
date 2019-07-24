@@ -16,6 +16,6 @@ data_analyze <- function(x, y) {
   })
   names(x_split) <- sensors
   
-  plot(unlist(x_split$Fz[1,]), type="l", col="green")
-  densityPlot(unlist(x[1]))
+  plot(unlist(x_split$Fz[1,]), type="l", col="black", main="Fz[1]", xlab="samples", ylab="value")
+  densityPlot(unlist(x_split$Fz[1,]), col="black", main="Fz[1] density", xlab="value", ylab="density")
 }
