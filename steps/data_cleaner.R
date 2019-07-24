@@ -1,5 +1,5 @@
 data_cleaner <- function(data){
-  return(sapply(data, function(x) replace_outliers(x) ))
+  return(as.data.frame(sapply(data, function(x) replace_outliers(x) )))
 }
 
 replace_outliers <- function(x){
