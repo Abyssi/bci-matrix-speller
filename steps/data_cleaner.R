@@ -1,3 +1,4 @@
+#replace outliers
 data_cleaner <- function(data){
   return(as.data.frame(sapply(data, function(x) replace_outliers(x) )))
 }
