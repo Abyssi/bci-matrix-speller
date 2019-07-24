@@ -26,39 +26,39 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
   selected <- data_fselection(train_set$x, train_set$y)
   train_set$x <- selected$output
   selector <- selected$selector
-
+  
   # Normalize train set
   print("Normalize train set")
   source("./steps/data_normalization.R")
   normalized <- data_normalization(train_set$x)
   train_set$x <- normalized$output
   normalizer <- normalized$normalizer
-
+  
   ##### Now the test set pipeline #####
   
   # Feature select test set
   print("Feature select test set")
   source("./steps/data_fselection.R")
   test_set$x <- data_fselection(test_set$x, test_set$y, selector)$output
-
+  
   # Normalize test set
   print("Normalize test set")
   source("./steps/data_normalization.R")
   test_set$x <- data_normalization(test_set$x, normalizer)$output
-
+  
   ##### Now the model definition #####
   
   # Define the model
   print("Define the model")
   source("./utils/class_svm.R")
   model <- class_svm(kernel=kernel, cost=cost, weights=c("-1"=weight_no, "1"=weight_yes))
-
+  
   ##### Now the train phase #####
   
   # Train model
   print("Train model")
   source("./steps/svm_train.R")
-  train_result <- svm_train(train_set$x, train_set$y)
+  train_result <- svm_train(model, train_set$x, train_set$y)
   model <- train_result$model
   
   # Evalutate model on train set
@@ -72,7 +72,7 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
                         accuracy_by_char=accuracy_by_char(train_word, train_word_p),
                         train_word=train_word,
                         train_word_p=train_word_p)
-
+  
   ##### Now the test phase #####
   
   # Test model
@@ -91,7 +91,7 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
                        accuracy_by_char=accuracy_by_char(test_word, test_word_p),
                        test_word=test_word,
                        test_word_p=test_word_p)
-
+  
   #Return metrics
   metrics <- list(train_metrics=train_metrics, test_metrics=test_metrics)
   print(paste("Metrics:", metrics))
@@ -113,8 +113,9 @@ metrics <- n_cross_fold(x, y, 6, function (dataset) {
   #return(pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1))
   source("./utils/grid_search.R")
   return(grid_search(function(kernel, cost, weight_no, weight_yes) {
+    #return(pipeline(train_set=train_set, test_set=test_set, kernel=kernel, cost=cost, weight_no=weight_no, weight_yes=weight_yes))
     return(pipeline(train_set, test_set, kernel, cost, weight_no, weight_yes))
-  }, list(kernel=c("linear", "radial", "sigmoid"), cost=c(1), weight_no=c(1/6), weight_yes=c(1))))
+  }, list(kernel=c("radial", "sigmoid"), cost=c(0.001, 0.1), weight_no=c(1/6), weight_yes=c(1))))
 }, i=5)
 
-print(metrics)
+#print(metrics)

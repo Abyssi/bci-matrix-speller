@@ -1,4 +1,4 @@
-svm_train <- function(x, y, model=class_svm()) {
+svm_train <- function(model, x, y) {
   set.seed(123)
   
   model <- model(x, y)
