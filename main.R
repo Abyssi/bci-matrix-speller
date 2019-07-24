@@ -5,7 +5,7 @@ x <- data$x
 y <- data$y
 
 pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, weight_yes=1) {
-  print("Starting")
+  print("Starting pipeline")
   raw_train_set <- train_set
   raw_test_set <- test_set
   ##### Now the train set pipeline #####
@@ -95,22 +95,28 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
                        test_word_p=test_word_p)
 
   #Return metrics
-  return(list(train_metrics=train_metrics, test_metrics=test_metrics))
+  metrics <- list(train_metrics=train_metrics, test_metrics=test_metrics)
+  print(paste("Metrics:", metrics))
+  return(metrics)
 }
 
 # Split dataset
 source("./steps/data_split.R")
-dataset <- data_split(x, y, percentage = 0.8)
-train_set <- list(x=dataset$x_train, y=dataset$y_train)
-test_set <- list(x=dataset$x_test, y=dataset$y_test)
-metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1)
+#dataset <- data_split(x, y, percentage = 0.8)
+#train_set <- list(x=dataset$x_train, y=dataset$y_train)
+#test_set <- list(x=dataset$x_test, y=dataset$y_test)
+#metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1)
 #source("./utils/grid_search.R")
 #metrics <- grid_search(pipeline, list(train_set=c(train_set), test_set=c(test_set), kernel=c("linear", "radial", "polynomial", "sigmoid", "custom"), cost=c(1:10), weight_no=c(0.5), weight_yes=c(1)))
 
-#metrics <- n_cross_fold(x, y, 6, function (dataset) {
-#  train_set <- list(x=dataset$x_train, y=dataset$y_train)
-#  test_set <- list(x=dataset$x_test, y=dataset$y_test)
-#  return(pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1))
-#})
+metrics <- n_cross_fold(x, y, 6, function (dataset) {
+  train_set <- list(x=dataset$x_train, y=dataset$y_train)
+  test_set <- list(x=dataset$x_test, y=dataset$y_test)
+  #return(pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1))
+  source("./utils/grid_search.R")
+  return(grid_search(function(kernel, cost, weight_no, weight_yes) {
+    return(pipeline(train_set, test_set, kernel, cost, weight_no, weight_yes))
+  }, list(kernel=c("linear", "radial", "polynomial", "sigmoid", "custom"), cost=c(1:10), weight_no=c(0.5), weight_yes=c(1))))
+}, i=5)
 
 print(metrics)

@@ -1,4 +1,3 @@
-library("dplyr")
 library("car")
 
 data_analyze <- function(x, y) {

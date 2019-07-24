@@ -58,7 +58,7 @@ accuracy_by_char <- function(y, y_pred) {
 
 accuracy_by_row_column <- function(y, y_pred) {
   res <- y - y_pred
-  return(length(res[res>0])/(length(y)/6))
+  return(1- length(res[res>0])/(length(y)/6))
 }
 
 #c_test <- rep(c(1, 2, 6, 4, 3, 5, 7, 8, 12, 10, 9, 11), times = 10*5)
