@@ -69,7 +69,7 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
   train_word_p <- translate_to_word(raw_train_set$x[,ncol(raw_train_set$x)], train_p)
   
   train_metrics <- list(metrics=train_result$metrics, 
-                        accuracy_by_row_column=accuracy_by_row_column(train_set$y, train_p),
+                        accuracy_by_row_column=accuracy_by_row_column(train_set$y, find_best_pairs(train_p)),
                         accuracy_by_char=accuracy_by_char(train_word, train_word_p),
                         train_word=train_word,
                         train_word_p=train_word_p)
@@ -89,7 +89,7 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
   test_word_p <- translate_to_word(raw_test_set$x[,ncol(raw_test_set$x)], test_p)
   
   test_metrics <- list(metrics=test_result$metrics, 
-                       accuracy_by_row_column=accuracy_by_row_column(test_set$y, test_p),
+                       accuracy_by_row_column=accuracy_by_row_column(test_set$y, find_best_pairs(test_p)),
                        accuracy_by_char=accuracy_by_char(test_word, test_word_p),
                        test_word=test_word,
                        test_word_p=test_word_p)
@@ -100,17 +100,17 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
 
 # Split dataset
 source("./steps/data_split.R")
-#dataset <- data_split(x, y, percentage = 0.8)
-#train_set <- list(x=dataset$x_train, y=dataset$y_train)
-#test_set <- list(x=dataset$x_test, y=dataset$y_test)
-#metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1)
+dataset <- data_split(x, y, percentage = 0.8)
+train_set <- list(x=dataset$x_train, y=dataset$y_train)
+test_set <- list(x=dataset$x_test, y=dataset$y_test)
+metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1)
 #source("./utils/grid_search.R")
 #metrics <- grid_search(pipeline, list(train_set=c(train_set), test_set=c(test_set), kernel=c("linear", "radial", "polynomial", "sigmoid", "custom"), cost=c(1:10), weight_no=c(0.5), weight_yes=c(1)))
 
-metrics <- n_cross_fold(x, y, 6, function (dataset) {
-  train_set <- list(x=dataset$x_train, y=dataset$y_train)
-  test_set <- list(x=dataset$x_test, y=dataset$y_test)
-  return(pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1))
-})
+#metrics <- n_cross_fold(x, y, 6, function (dataset) {
+#  train_set <- list(x=dataset$x_train, y=dataset$y_train)
+#  test_set <- list(x=dataset$x_test, y=dataset$y_test)
+#  return(pipeline(train_set=train_set, test_set=test_set, kernel="sigmoid", cost=5, weight_no=0.5, weight_yes=1))
+#})
 
 print(metrics)
