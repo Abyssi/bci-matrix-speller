@@ -1,4 +1,4 @@
-data_split <- function(x, y, percentage = 0.7){
+data_split <- function(x, y, percentage = 0.7) {
   set.seed(123)
   
   train_size <- floor((percentage * nrow(x) / 120)) * 120
@@ -10,4 +10,17 @@ data_split <- function(x, y, percentage = 0.7){
   y_test <- y[-train_size:-1,]
   
   return(list(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test))
+}
+
+n_cross_fold <- function(x, y, n, func) {
+  folds <- cut(seq(1, nrow(x)), breaks=n, labels=FALSE)
+  lapply(1:n, function(i) {
+    testIndexes <- which(folds==i, arr.ind=TRUE)
+    x_train <- x[-testIndexes, ]
+    y_train <- y[-testIndexes, ]
+    
+    x_test <- x[testIndexes, ]
+    y_test <- y[testIndexes, ]
+    return(func(list(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)))
+  })
 }
