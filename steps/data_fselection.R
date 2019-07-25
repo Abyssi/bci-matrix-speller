@@ -35,7 +35,7 @@ data_fselection <- function(x_data, y_data, selector=NULL) {
   
   # Feature extraction
   if (is.null(selector)) {
-    features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFexpRank", kNearestExpRank=100, ReliefIterations=5)
+    features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFexpRank", kNearestExpRank=80, ReliefIterations=5)
     #features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFequalK", kNearestExpRank=10, ReliefIterations=5)
     features <- sort(features, decreasing = T)
     features_subset <- names(features)[which(features >= 0)]
