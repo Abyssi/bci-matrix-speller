@@ -9,31 +9,31 @@ data_fselection <- function(x_data, y_data, selector=NULL) {
     return(x_data[unlist(columns)])
   })
   names(data_split) <- sensors
-  
   result <- as.data.frame(x_data)
+
+  # Low pass filter
+  res_lpf <- lapply(data_split, function (values) {
+    fil <- as.data.frame(t(apply(values, 1, function(value) {
+      return(filter(butter(2, 1/5, type="low"), unlist(value)))
+    })))
+    names(fil) <- lapply(names(values), function(x) { return(paste("F", x, sep="_")) })
+    return(fil)
+  })
+  res_lpf <- Reduce(function(...) cbind(...), res_lpf)
+  result <- cbind(res_lpf, x_data["C_1"])
+
   # Derivative
   #res_der <- lapply(data_split, function (value) {
   #  der <- as.data.frame(t(diff(t(as.matrix(value)), lag=1)))
   #  names(der) <- lapply(names(der), function(x) { return(paste("D", x, sep="_")) })
   #  return(der)
   #})
-  #res_der <- Reduce(function(...) cbind(...), result)
+  #res_der <- Reduce(function(...) cbind(...), res_der)
   #result <- cbind(result, res_der)
-
-  # Low pass filter
-  res_lpf <- lapply(data_split, function (values) {
-    fil <- as.data.frame(t(apply(values, 1, function(value) {
-      return(filter(butter(1, 1/5, type="low"), unlist(value)))
-    })))
-    names(fil) <- lapply(names(values), function(x) { return(paste("F", x, sep="_")) })
-    return(fil)
-  })
-  res_lpf <- Reduce(function(...) cbind(...), result)
-  result <- cbind(res_lpf, x_data["C_1"])
   
   # Feature extraction
   if (is.null(selector)) {
-    features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFexpRank", kNearestExpRank=70, ReliefIterations=5)
+    features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFexpRank", kNearestExpRank=100, ReliefIterations=5)
     #features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFequalK", kNearestExpRank=10, ReliefIterations=5)
     features <- sort(features, decreasing = T)
     features_subset <- names(features)[which(features >= 0)]
