@@ -15,7 +15,7 @@ data_split <- function(x, y, percentage = 0.7) {
 n_cross_fold <- function(x, y, n, func, i=-1) {
   print(paste("Starting", n, "cross fold validation"))
   folds <- cut(seq(1, nrow(x)), breaks=n, labels=FALSE)
-  lapply(if(i== -1) 1:n else i:i, function(i) {
+  lapply(if(i == -1) 1:n else i:i, function(i) {
     print(paste("Split index:", i))
     testIndexes <- which(folds==i, arr.ind=TRUE)
     x_train <- x[-testIndexes, ]

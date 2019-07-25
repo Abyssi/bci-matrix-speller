@@ -31,6 +31,15 @@ data_fselection <- function(x_data, y_data, selector=NULL) {
   #res_der <- Reduce(function(...) cbind(...), res_der)
   #result <- cbind(result, res_der)
   
+  # Derivative
+  #res_der <- lapply(data_split, function (value) {
+  #  der <- as.data.frame(t(diff(t(as.matrix(value)), lag=1)))
+  #  names(der) <- lapply(names(der), function(x) { return(paste("D", x, sep="_")) })
+  #  return(der)
+  #})
+  #res_der <- Reduce(function(...) cbind(...), res_der)
+  #result <- cbind(result, res_der)
+  
   # Feature extraction
   if (is.null(selector)) {
     features <- attrEval(label ~ ., cbind(result, label=as.factor(y_data)), estimator="ReliefFexpRank", kNearestExpRank=100, ReliefIterations=5)
