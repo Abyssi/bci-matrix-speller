@@ -4,6 +4,11 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
   raw_test_set <- test_set
   ##### Now the train set pipeline #####
   
+  # Analyze train set
+  print("Analyze train set")
+  source("./steps/data_analyzer.R")
+  data_analyze(train_set$x, train_set$y)
+  
   # Clean train set
   print("Clean train set")
   source("./steps/data_cleaner.R")
@@ -85,7 +90,7 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
 # Load dataset
 source("./steps/data_loader.R")
 train_data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
-test_data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt")
+test_data <- data_load("./dataset/raw/X_test.txt", "./dataset/raw/C_test.txt")
 
 # Define dataset
 train_set <- list(x=train_data$x, y=unlist(train_data$y))

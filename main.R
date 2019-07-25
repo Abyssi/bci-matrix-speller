@@ -1,9 +1,3 @@
-# Load dataset
-source("./steps/data_loader.R")
-data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
-x <- data$x
-y <- data$y
-
 pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, weight_yes=1) {
   print("Starting pipeline")
   raw_train_set <- train_set
@@ -102,22 +96,42 @@ pipeline <- function(train_set, test_set, kernel="linear", cost=1, weight_no=1, 
   return(metrics)
 }
 
-# Split dataset
-#dataset <- data_split(x, y, percentage = 0.8)
+# Load dataset
+source("./steps/data_loader.R")
+data <- data_load("./dataset/raw/X.txt", "./dataset/raw/C.txt", "./dataset/raw/Y.txt")
+
+# For fixed split dataset uncomment this
+#source("./steps/data_split.R")
+#dataset <- data_split(data$x, data$y, percentage = 0.8)
 #train_set <- list(x=dataset$x_train, y=dataset$y_train)
 #test_set <- list(x=dataset$x_test, y=dataset$y_test)
-#metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="linear", cost=0.01, weight_no=1, weight_yes=1)
-#source("./utils/grid_search.R")
-#metrics <- grid_search(pipeline, list(train_set=c(train_set), test_set=c(test_set), kernel=c("linear", "radial", "polynomial", "sigmoid", "custom"), cost=c(1:10), weight_no=c(0.5), weight_yes=c(1)))
 
-metrics <- n_cross_fold(x, y, 6, function (dataset) {
+# For single run uncomment this
+
+#metrics <- pipeline(train_set=train_set, test_set=test_set, kernel="linear", cost=0.01, weight_no=1, weight_yes=1)
+
+# For grid search uncomment this
+
+#source("./utils/grid_search.R")
+#metrics <- grid_search(function(kernel, cost, weight_no, weight_yes) {
+#  return(pipeline(train_set, test_set, kernel, cost, weight_no, weight_yes))
+#  }, list(kernel=c("linear", "radial"), cost=c(0.01, 0.001), weight_no=c(1), weight_yes=c(1))))
+#})
+
+# For n cross fold uncomment this
+source("./steps/data_split.R")
+metrics <- n_cross_fold(data$x, data$y, 6, function (dataset) {
   train_set <- list(x=dataset$x_train, y=dataset$y_train)
   test_set <- list(x=dataset$x_test, y=dataset$y_test)
   return(pipeline(train_set=train_set, test_set=test_set, kernel="linear", cost=0.01, weight_no=1, weight_yes=1))
+  
+  # For grid search inside n cross fold uncomment this
+  
 #  source("./utils/grid_search.R")
 #  return(grid_search(function(kernel, cost, weight_no, weight_yes) {
 #    return(pipeline(train_set, test_set, kernel, cost, weight_no, weight_yes))
-#  }, list(kernel=c("linear"), cost=c(0.01), weight_no=c(1), weight_yes=c(1))))
+#  }, list(kernel=c("linear", "radial"), cost=c(0.01, 0.001), weight_no=c(1), weight_yes=c(1))))
+#}, i=1)
 })
 
 #print(metrics)
